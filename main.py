@@ -8,6 +8,8 @@ SCREEN_TITLE = "Platformer"
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
+SPRITE_PIXEL_SIZE = 128
+GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
 PLAYER_MOVEMENT_SPEED = 15
 GRAVITY = 1
@@ -25,6 +27,9 @@ LEFT_FACING = 1
 
 MOVEMENT_SPEED = 5
 UPDATES_PER_FRAME = 7
+
+PLAYER_START_X = 150
+PLAYER_START_Y = 100
 
 def load_texture_pair(filename):
     """
@@ -74,13 +79,14 @@ class MyGame(arcade.Window):
         self.score = 0
         # self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
         arcade.set_background_color((0, 150, 255))
+        # Level
+        self.level = 1
 
-    def setup(self):
+    def setup(self, level):
         # Инициализируем три объекта: игрок, стены, монеты
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         self.coin_list = arcade.SpriteList(use_spatial_hash=True)
-
 
         # Load textures for walking
         self.walk_textures = []
@@ -88,39 +94,36 @@ class MyGame(arcade.Window):
         self.walk_textures.append(texture)
 
         self.player_sprite = arcade.Sprite("images/player/player_stand_right.png", CHARACTER_SCALING)
-        self.player_sprite.center_x = 64
+        self.player_sprite.center_x = 150
         self.player_sprite.center_y = 100
         self.player_list.append(self.player_sprite)
 
-        # Set up the player, specifically placing it at these coordinates.
-        for x in range(0, 1250, 64):
-            grass = arcade.Sprite("images/textures/grass.png", TILE_SCALING)
-            grass.center_x = x
-            grass.center_y = 32
-            self.wall_list.append(grass)
-        coordinate_list = [[256, 120],
-                           [512, 150],
-                           [750, 200]]
-        for coordinate in coordinate_list:
-            # Add a crate on the ground
-            wall = arcade.Sprite("images/textures/block.png", TILE_SCALING)
-            wall.position = coordinate
-            self.wall_list.append(wall)
-        # Use a loop to place some coins for our character to pick up
-        for x in range(128, 1250, 256):
-            coin = arcade.Sprite("images/textures/coin.png", COIN_SCALING)
-            coin.center_x = x
-            coin.center_y = 96
-            self.coin_list.append(coin)
+        # Name of the layer in the file that has our platforms/walls
 
-        # Create the 'physics engine'
+        platforms_layer_name = 'Platforms'
+        coins_layer_name = 'Coins'
+        self.dont_touch_list = None
+        dont_touch_layer_name = "Don't Touch"
+        map_name = f"maps/map_level_{level}.tmx"
+        my_map = arcade.tilemap.read_tmx(map_name)
+        self.end_of_map = my_map.map_size.width * GRID_PIXEL_SIZE
+        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
+                                                        layer_name = platforms_layer_name,
+                                                        scaling = TILE_SCALING,
+                                                        use_spatial_hash = True)
+        self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name, TILE_SCALING)
+        # -- Don't Touch Layer
+        self.dont_touch_list = arcade.tilemap.process_layer(my_map,
+                                                            dont_touch_layer_name,
+                                                            TILE_SCALING,
+                                                            use_spatial_hash=True)
+        if my_map.background_color:
+            arcade.set_background_color(my_map.background_color)
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                                self.wall_list,
+                                                                         GRAVITY)
+
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite, self.wall_list, GRAVITY)
-
-        # self.walk_textures = []
-        # texture = arcade.load_texture("images/player/player_stand_right.png")
-        # self.walk_textures.append(texture)
-        # texture = arcade.load_texture("images/player/player_stand_left.png")
-        # self.walk_textures.append(texture)
 
     def on_draw(self):
         """ Отрендерить этот экран. """
@@ -129,10 +132,18 @@ class MyGame(arcade.Window):
         self.wall_list.draw()
         self.coin_list.draw()
         self.player_list.draw()
+        self.dont_touch_list.draw()
 
+        level_text = f"Level: {self.level}"
         score_text = f"Score: {self.score}"
-        arcade.draw_text(score_text, 350 + self.view_left, 550 + self.view_bottom,
+        arcade.draw_text(level_text, 300 + self.view_left, 550 + self.view_bottom,
+                         arcade.csscolor.WHITE, 30)
+        arcade.draw_text(score_text, 450 + self.view_left, 550 + self.view_bottom,
                 arcade.csscolor.WHITE, 30)
+        if self.level == 3:
+            end_text = f"!!!YOU WIN!!!"
+            arcade.draw_text(end_text, 250 + self.view_left, 300 + self.view_bottom,
+                             arcade.csscolor.BLACK, 50)
 
     def update(self, delta_time):
         # Move the player with the physics engine
@@ -147,6 +158,16 @@ class MyGame(arcade.Window):
             coin.remove_from_sprite_lists()
             self.score += 1
             # arcade.play_sound(self.collect_coin_sound)
+        changed_viewport = False
+
+        if self.player_sprite.center_y < -100:
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
+
+            # Set the camera to the start
+            self.view_left = 0
+            self.view_bottom = 0
+            changed_viewport = True
 
         # --- Manage Scrolling ---
         # Track if we need to change the viewport
@@ -182,6 +203,33 @@ class MyGame(arcade.Window):
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
 
+        # Did the player touch something they should not?
+
+        if arcade.check_for_collision_with_list(self.player_sprite,
+                                                self.dont_touch_list):
+            self.player_sprite.change_x = 0
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
+
+            # Set the camera to the start
+            self.view_left = 0
+            self.view_bottom = 0
+            changed_viewport = True
+
+        # next level
+        if self.score == 15:
+            # Advance to the next level
+            self.score = 0
+            self.level += 1
+            # Load the next level
+            if self.level==2:
+                self.setup(self.level)
+            # Set the camera to the start
+            self.view_left = 0
+            self.view_bottom = 0
+            changed_viewport = True
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         if key == arcade.key.UP or key == arcade.key.W:
@@ -204,25 +252,14 @@ class MyGame(arcade.Window):
        elif key == arcade.key.DOWN or key == arcade.key.S:
            self.player_sprite.change_y = 0
        elif key == arcade.key.LEFT or key == arcade.key.A:
-           # self.player_sprite = arcade.Sprite("images/player/player_stand_left.png", CHARACTER_SCALING)
-           # self.player_list.append(self.player_sprite)
-           texture = arcade.load_texture("images/player/player_stand_left.png", flipped_horizontally=True)
-           self.player_sprite.set_texture(texture)
            self.player_sprite.change_x = 0
        elif key == arcade.key.RIGHT or key == arcade.key.D:
            self.player_sprite.change_x = 0
 
-    # def update_animation(self, delta_time: float = 1 / 60):
-    #     # Walking animation
-    #     self.cur_texture += 1
-    #     if self.cur_texture > 7:
-    #         self.cur_texture = 0
-    #     self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
-
 
 def main():
     game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
+    game.setup(1)
     arcade.run()
 
 
