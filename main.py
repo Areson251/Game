@@ -44,11 +44,14 @@ def load_texture_pair(filename):
 class PlayerCharacter(arcade.Sprite):
     def __init__(self):
         super().__init__()
-        main_path = "images/player"
+
+        self.character_face_direction = RIGHT_FACING
+        self.scale = CHARACTER_SCALING
+
+        main_path = "images/player/"
         self.idle_texture_pair = load_texture_pair(f"{main_path}player_stand_right.png")
-        self.walk_textures = []
-        texture = load_texture_pair("images/player/player_stand_right.png")
-        self.walk_textures.append(texture)
+        self.walk_textures = load_texture_pair("images/player/player_stand_right.png")
+
 
     def update_animation(self, delta_time: float = 1 / 60):
         # Figure out if we need to flip face left or right
@@ -62,11 +65,8 @@ class PlayerCharacter(arcade.Sprite):
             self.texture = self.idle_texture_pair[self.character_face_direction]
             return
 
-        # Walking animation
-        self.cur_texture += 1
-        if self.cur_texture > 5 * UPDATES_PER_FRAME:
-            self.cur_texture = 0
-        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+        # Walking
+        self.texture = self.walk_textures[self.character_face_direction]
 
 
 class MyGame(arcade.Window):
@@ -77,10 +77,11 @@ class MyGame(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
         self.score = 0
-        # self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
+        self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
         arcade.set_background_color((0, 150, 255))
         # Level
         self.level = 1
+        self.player_sprite = PlayerCharacter()
 
     def setup(self, level):
         # Инициализируем три объекта: игрок, стены, монеты
@@ -93,7 +94,6 @@ class MyGame(arcade.Window):
         texture = load_texture_pair("images/player/player_stand_right.png")
         self.walk_textures.append(texture)
 
-        self.player_sprite = arcade.Sprite("images/player/player_stand_right.png", CHARACTER_SCALING)
         self.player_sprite.center_x = 150
         self.player_sprite.center_y = 100
         self.player_list.append(self.player_sprite)
@@ -157,7 +157,7 @@ class MyGame(arcade.Window):
             # Remove the coin
             coin.remove_from_sprite_lists()
             self.score += 1
-            # arcade.play_sound(self.collect_coin_sound)
+                # arcade.play_sound(self.collect_coin_sound)
         changed_viewport = False
 
         if self.player_sprite.center_y < -100:
