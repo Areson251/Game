@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.6.0" orientation="orthogonal" renderorder="right-down" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" name="tiles" tilewidth="150" tileheight="150" tilecount="5" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="150" height="150" source="../images/textures/block2.png"/>
+  </tile>
+  <tile id="1">
+   <image width="150" height="150" source="../images/textures/block3.png"/>
+  </tile>
+  <tile id="2">
+   <image width="150" height="150" source="../images/textures/coin.png"/>
+  </tile>
+  <tile id="4">
+   <image width="150" height="150" source="../images/textures/magma.png"/>
+  </tile>
+  <tile id="5">
+   <image width="150" height="94" source="../images/textures/fire.png"/>
+  </tile>
+ </tileset>
+ <layer id="1" name="Platforms" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZKAtYITi4WgHEwXmMSFhXHagyxNjJiFAbFjhMotadmDzPymAFnGO7hZq20FMnFPbLnQ7SA13JjQaFxjO+RwZUJpuibGDVIDNLeTaQYr/aBkfMDfQM85xYULqSDGL1hgAvucAkg==
+  </data>
+ </layer>
+ <layer id="3" name="Don't Touch" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBiegG2QmEELMFjdNZTBYAhTNgby3DEY3D5YwHAPi8Hgv8HgBkoBGwPx+Y0VignJ41NDLwAALIsAaA==
+  </data>
+ </layer>
+ <layer id="2" name="Coins" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBh6gHmA9ZNjBjXspBdgRqMHO6CmO4eKn0FgpPp7sAJsYTiYw5UStw1mf+ECQ9HNpAIAy8wALg==
+  </data>
+ </layer>
+</map>
