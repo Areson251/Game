@@ -10,6 +10,7 @@ COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 128
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
+START_LEVEL = 2
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 20
 PLAYER_MOVEMENT_SPEED = 15
@@ -39,11 +40,11 @@ class MyGame(arcade.Window):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
-        self.score = 0
+        self.score = 14
         self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
         arcade.set_background_color((0, 150, 255))
         # Level
-        self.level = 1
+        self.level = START_LEVEL
         self.time_pause = 0
         self.game_over = None
         self.player_sprite = PlayerCharacter.PlayerCharacter()
@@ -83,55 +84,56 @@ class MyGame(arcade.Window):
                                                                 self.wall_list,
                                                                          GRAVITY)
 
-        # -- Draw a enemy1 on the platform
-        enemy1 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
-        enemy1.bottom = SPRITE_SIZE *3.2
-        enemy1.left = SPRITE_SIZE * 3
-        # Set boundaries on the left/right the enemy can't cross
-        enemy1.boundary_right = SPRITE_SIZE * 6
-        enemy1.boundary_left = SPRITE_SIZE * 3
-        enemy1.change_x = 2
-        self.enemy_list.append(enemy1)
+        if self.level == 1:
+            # -- Draw a enemy1 on the platform
+            enemy1 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
+            enemy1.bottom = SPRITE_SIZE *3.2
+            enemy1.left = SPRITE_SIZE * 3
+            # Set boundaries on the left/right the enemy can't cross
+            enemy1.boundary_right = SPRITE_SIZE * 6
+            enemy1.boundary_left = SPRITE_SIZE * 3
+            enemy1.change_x = 2
+            self.enemy_list.append(enemy1)
 
-        # -- Draw a enemy2 on the platform
-        enemy2 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
-        enemy2.bottom = SPRITE_SIZE *14.2
-        enemy2.left = SPRITE_SIZE * 7
-        # Set boundaries on the left/right the enemy can't cross
-        enemy2.boundary_right = SPRITE_SIZE * 10
-        enemy2.boundary_left = SPRITE_SIZE * 7
-        enemy2.change_x = 4
-        self.enemy_list.append(enemy2)
+            # -- Draw a enemy2 on the platform
+            enemy2 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
+            enemy2.bottom = SPRITE_SIZE *14.2
+            enemy2.left = SPRITE_SIZE * 7
+            # Set boundaries on the left/right the enemy can't cross
+            enemy2.boundary_right = SPRITE_SIZE * 10
+            enemy2.boundary_left = SPRITE_SIZE * 7
+            enemy2.change_x = 4
+            self.enemy_list.append(enemy2)
 
-        # -- Draw a enemy2 on the platform
-        enemy3 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
-        enemy3.bottom = SPRITE_SIZE *12.2
-        enemy3.left = SPRITE_SIZE * 16
-        # Set boundaries on the left/right the enemy can't cross
-        enemy3.boundary_right = SPRITE_SIZE * 19
-        enemy3.boundary_left = SPRITE_SIZE * 16
-        enemy3.change_x = 1
-        self.enemy_list.append(enemy3)
+            # -- Draw a enemy2 on the platform
+            enemy3 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
+            enemy3.bottom = SPRITE_SIZE *12.2
+            enemy3.left = SPRITE_SIZE * 16
+            # Set boundaries on the left/right the enemy can't cross
+            enemy3.boundary_right = SPRITE_SIZE * 19
+            enemy3.boundary_left = SPRITE_SIZE * 16
+            enemy3.change_x = 1
+            self.enemy_list.append(enemy3)
 
-        # -- Draw a enemy2 on the platform
-        enemy4 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
-        enemy4.bottom = SPRITE_SIZE *5.2
-        enemy4.left = SPRITE_SIZE * 10
-        # Set boundaries on the left/right the enemy can't cross
-        enemy4.boundary_right = SPRITE_SIZE * 13
-        enemy4.boundary_left = SPRITE_SIZE * 10
-        enemy4.change_x = 3
-        self.enemy_list.append(enemy4)
+            # -- Draw a enemy2 on the platform
+            enemy4 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
+            enemy4.bottom = SPRITE_SIZE *5.2
+            enemy4.left = SPRITE_SIZE * 10
+            # Set boundaries on the left/right the enemy can't cross
+            enemy4.boundary_right = SPRITE_SIZE * 13
+            enemy4.boundary_left = SPRITE_SIZE * 10
+            enemy4.change_x = 3
+            self.enemy_list.append(enemy4)
 
-        # -- Draw a enemy2 on the platform
-        enemy5 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
-        enemy5.bottom = SPRITE_SIZE *2.2
-        enemy5.left = SPRITE_SIZE * 7
-        # Set boundaries on the left/right the enemy can't cross
-        enemy5.boundary_right = SPRITE_SIZE * 30
-        enemy5.boundary_left = SPRITE_SIZE * 7
-        enemy5.change_x = 5
-        self.enemy_list.append(enemy5)
+            # -- Draw a enemy2 on the platform
+            enemy5 = arcade.Sprite(":resources:images/enemies/wormGreen.png", SPRITE_SCALING)
+            enemy5.bottom = SPRITE_SIZE *2.2
+            enemy5.left = SPRITE_SIZE * 7
+            # Set boundaries on the left/right the enemy can't cross
+            enemy5.boundary_right = SPRITE_SIZE * 30
+            enemy5.boundary_left = SPRITE_SIZE * 7
+            enemy5.change_x = 5
+            self.enemy_list.append(enemy5)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite, self.wall_list, GRAVITY)
 
@@ -139,6 +141,9 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.player_list.update_animation()
         self.physics_engine.update()
+
+        if self.level == 3:
+            time.sleep(1000000)
 
         if self.game_over:
             time.sleep(3)
@@ -237,7 +242,6 @@ class MyGame(arcade.Window):
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
 
-
     def on_draw(self):
         """ Отрендерить этот экран. """
         arcade.start_render()
@@ -298,7 +302,7 @@ class MyGame(arcade.Window):
 
 def main():
     game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup(1)
+    game.setup(START_LEVEL)
     arcade.run()
 
 
