@@ -10,7 +10,7 @@ COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 128
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
-START_LEVEL = 2
+START_LEVEL = 1
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 20
 PLAYER_MOVEMENT_SPEED = 15
@@ -40,7 +40,7 @@ class MyGame(arcade.Window):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
-        self.score = 14
+        self.score = 0
         self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
         arcade.set_background_color((0, 150, 255))
         # Level
