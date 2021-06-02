@@ -41,16 +41,14 @@ class MyGame(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
         self.score = 0
-        self.collect_coin_sound = arcade.load_sound("sounds/get_coin.wav")
         arcade.set_background_color((0, 150, 255))
         # Level
         self.level = START_LEVEL
-        self.time_pause = 0
         self.game_over = None
         self.player_sprite = PlayerCharacter.PlayerCharacter()
 
     def setup(self, level):
-        # Инициализируем три объекта: игрок, стены, монеты
+        # Инициализируем 3 объекта: стены, монеты, враги
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         self.coin_list = arcade.SpriteList(use_spatial_hash=True)
@@ -78,11 +76,6 @@ class MyGame(arcade.Window):
                                                             dont_touch_layer_name,
                                                             TILE_SCALING,
                                                             use_spatial_hash=True)
-        if my_map.background_color:
-            arcade.set_background_color(my_map.background_color)
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                                self.wall_list,
-                                                                         GRAVITY)
 
         if self.level == 1:
             # -- Draw a enemy1 on the platform

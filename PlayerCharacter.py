@@ -1,7 +1,6 @@
 import arcade
 
 
-CHARACTER_SCALING = 1
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
@@ -11,7 +10,6 @@ class PlayerCharacter(arcade.Sprite):
         super().__init__()
 
         self.character_face_direction = RIGHT_FACING
-        self.scale = CHARACTER_SCALING
 
         main_path = "images/player/"
         self.idle_texture_pair = self.load_texture_pair(f"{main_path}player_stand_right.png")
