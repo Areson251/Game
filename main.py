@@ -60,19 +60,19 @@ class MyGame(arcade.Window):
 
         # Name of the layer in the file that has our platforms/walls
         platforms_layer_name = 'Platforms'
-        coins_layer_name = 'Coins'
+        self.coins_layer_name = 'Coins'
         self.dont_touch_list = None
         dont_touch_layer_name = "Don't Touch"
         map_name = f"maps/map_level_{level}.tmx"
-        my_map = arcade.tilemap.read_tmx(map_name)
-        self.end_of_map = my_map.map_size.width * GRID_PIXEL_SIZE
-        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
+        self.my_map = arcade.tilemap.read_tmx(map_name)
+        self.end_of_map = self.my_map.map_size.width * GRID_PIXEL_SIZE
+        self.wall_list = arcade.tilemap.process_layer(map_object=self.my_map,
                                                         layer_name = platforms_layer_name,
                                                         scaling = TILE_SCALING,
                                                         use_spatial_hash = True)
-        self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name, TILE_SCALING)
+        self.coin_list = arcade.tilemap.process_layer(self.my_map, self.coins_layer_name, TILE_SCALING)
         # -- Don't Touch Layer
-        self.dont_touch_list = arcade.tilemap.process_layer(my_map,
+        self.dont_touch_list = arcade.tilemap.process_layer(self.my_map,
                                                             dont_touch_layer_name,
                                                             TILE_SCALING,
                                                             use_spatial_hash=True)
@@ -204,6 +204,9 @@ class MyGame(arcade.Window):
             changed_viewport = True
 
         if self.game_over:
+            self.score = 0
+            coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
+            self.coin_list = arcade.tilemap.process_layer(self.my_map, self.coins_layer_name, TILE_SCALING)
             self.player_sprite.center_x = PLAYER_START_X
             self.player_sprite.center_y = PLAYER_START_Y
             # Set the camera to the start
